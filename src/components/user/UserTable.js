@@ -13,7 +13,7 @@ const headerProps = {
 class UserTable extends Component {
     state = {
         users: [],
-        size: 1,
+        size: 5,
         totalElements: 0,
         activePage: 1
     }
