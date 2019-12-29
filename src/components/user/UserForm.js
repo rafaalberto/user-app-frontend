@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import axios from 'axios';
 
 import Main from '../template/Main';
-import UserTable from './UserTable';
+// import UserTable from './UserTable';
 
 const headerProps = {
     icon: 'users',
@@ -10,25 +10,33 @@ const headerProps = {
     subtitle: 'Cadastro de Usuários'
 }
 
-const baseUrl = 'http://localhost:8080/users';
+// const page = 0;
+// const size = 3;
+
+const baseUrl = `http://localhost:8080/users`;
 
 const initialState = {
     user: {name: '', username: '', password: ''},
-    users: []
+    // users: [],
+    // totalElements: 0
 }
 
 class UserForm extends Component {
     state = {...initialState}
 
-    componentDidMount() {
-        this.fetchUsers();
-    }
+    // componentDidMount() {
+    //     // this.fetchUsers();
+    // }
 
-    fetchUsers = () => {
-        axios(baseUrl).then(response => {
-            this.setState({ user: initialState.user, users: response.data })
-        })
-    }
+    // fetchUsers = () => {
+    //     axios(baseUrl + `?page=${page}&size=${size}`).then(response => {
+    //         this.setState({ 
+    //             user: initialState.user, 
+    //             users: response.data.content, 
+    //             totalElements: response.data.totalElements
+    //         })
+    //     })
+    // }
 
     handleChange = event => {
         const user = {...this.state.user};
@@ -51,15 +59,15 @@ class UserForm extends Component {
         this.setState({ user: initialState.user });
     }
 
-    loadItem = user => {
-        this.setState({ user });
-    }
+    // loadItem = user => {
+    //     this.setState({ user });
+    // }
 
-    removeItem = user => {
-        axios.delete(`${baseUrl}/${user.id}`).then(response => {
-            this.fetchUsers();
-        })
-    }
+    // removeItem = user => {
+    //     axios.delete(`${baseUrl}/${user.id}`).then(response => {
+    //         this.fetchUsers();
+    //     })
+    // }
 
     renderForm() {
         const user = this.state.user;
@@ -100,7 +108,7 @@ class UserForm extends Component {
         return (
             <Main {...headerProps}>
                 { this.renderForm() }
-                <UserTable items={this.state.users} loadItem={this.loadItem} removeItem={this.removeItem} />
+                {/* <UserTable items={this.state.users} loadItem={this.loadItem} removeItem={this.removeItem} totalElements={this.state.totalElements} size={size} /> */}
             </Main>
             
         );

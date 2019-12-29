@@ -87,3 +87,7 @@ footer.footer {
             "footer";
     }
 }
+
+.avoid-click {
+    pointer-events: none;
+}
