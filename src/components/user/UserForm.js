@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
-import axios from 'axios';
-
 import Main from '../template/Main';
-// import UserTable from './UserTable';
+import api from '../../services/api';
 
 const headerProps = {
     icon: 'users',
@@ -10,33 +8,32 @@ const headerProps = {
     subtitle: 'Cadastro de Usuários'
 }
 
-// const page = 0;
-// const size = 3;
-
-const baseUrl = `http://localhost:8080/users`;
-
 const initialState = {
     user: {name: '', username: '', password: ''},
-    // users: [],
-    // totalElements: 0
+    id: 0
 }
 
 class UserForm extends Component {
-    state = {...initialState}
+    constructor(props) {
+        super(props);
+        this.state = {...initialState, id: props.match.params.id}
+    }
+    
+    componentDidMount() {
+        const { id }  = this.state;
+        if(id !== "0") {
+            this.fetchUser(id);
+        }
+    }
 
-    // componentDidMount() {
-    //     // this.fetchUsers();
-    // }
-
-    // fetchUsers = () => {
-    //     axios(baseUrl + `?page=${page}&size=${size}`).then(response => {
-    //         this.setState({ 
-    //             user: initialState.user, 
-    //             users: response.data.content, 
-    //             totalElements: response.data.totalElements
-    //         })
-    //     })
-    // }
+    fetchUser = async (id) => {
+        try {
+             const response = await api.get(`/users/${id}`);
+             this.setState({ user: response.data });
+        } catch (exception) {
+             console.error(exception.message);
+        }
+    }
 
     handleChange = event => {
         const user = {...this.state.user};
@@ -44,30 +41,24 @@ class UserForm extends Component {
         this.setState({ user });
     }
 
-    handleSubmit = event => {
+    handleSubmit = async event => {
         event.preventDefault();
         const user = this.state.user;
         const method = user.id ? 'put' : 'post';
-        const url = user.id ? `${baseUrl}/${user.id}` : baseUrl;
-        axios[method](url, user).then(response => {
-            this.fetchUsers();
-        })
-    }
+        const url = user.id ? `/users/${user.id}` : `/users`;
 
-    clear = event => {
+        try {
+            await api[method](url, user);
+            this.props.history.push('/users');
+        } catch (exception) {
+            console.error(exception.message);
+        }
+    }
+    
+    handleCancel = event => {
         event.preventDefault();
-        this.setState({ user: initialState.user });
+        this.props.history.push('/users');
     }
-
-    // loadItem = user => {
-    //     this.setState({ user });
-    // }
-
-    // removeItem = user => {
-    //     axios.delete(`${baseUrl}/${user.id}`).then(response => {
-    //         this.fetchUsers();
-    //     })
-    // }
 
     renderForm() {
         const user = this.state.user;
@@ -97,7 +88,7 @@ class UserForm extends Component {
                  <div className="row">
                      <div className="col-12 d-flex justify-content-end">
                          <button type="submit" className="btn btn-primary">Salvar</button>
-                         <button className="btn btn-secondary ml-2" onClick={this.clear}>Cancelar</button>
+                         <button className="btn btn-secondary ml-2" onClick={this.handleCancel}>Cancelar</button>
                      </div>
                  </div>
             </form>
@@ -108,9 +99,7 @@ class UserForm extends Component {
         return (
             <Main {...headerProps}>
                 { this.renderForm() }
-                {/* <UserTable items={this.state.users} loadItem={this.loadItem} removeItem={this.removeItem} totalElements={this.state.totalElements} size={size} /> */}
             </Main>
-            
         );
     }
 }

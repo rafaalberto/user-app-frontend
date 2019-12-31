@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
 import Main from '../template/Main';
-
-import api from '../../services/api';
 import Pagination from '../template/Pagination';
+import api from '../../services/api';
 
 const headerProps = {
     icon: 'users',
@@ -36,16 +35,33 @@ class UserTable extends Component {
         this.setState({ activePage: pageNumber })
     }
 
+    handleForm = () => {
+        this.props.history.push('/userForm/0');
+    }
+
+    handleEdit = user => {
+        this.props.history.push(`/userForm/${user.id}`);
+    }
+
+    handleDelete = async user => {
+        try {
+            await api.delete(`/users/${user.id}`);
+            this.fetchUsers();
+       } catch (exception) {
+            console.error(exception.message);
+       }
+    }
+
     renderRows = () => {
         return this.state.users.map(user => (
             <tr key={user.id}>
                 <td>{user.username}</td>
                 <td>{user.name}</td>
                 <td>
-                    <button className="btn btn-warning" onClick={() => console.log(user)}>
+                    <button className="btn btn-warning" onClick={() => this.handleEdit(user)}>
                         <i className="fa fa-pencil"></i>
                     </button>
-                    <button className="btn btn-danger ml-2" onClick={() => console.log(user)}>
+                    <button className="btn btn-danger ml-2" onClick={() => this.handleDelete(user)}>
                         <i className="fa fa-trash"></i>
                     </button>
                 </td>
@@ -57,6 +73,9 @@ class UserTable extends Component {
         return (
             <Main {...headerProps}>
                 <div>
+                    <button className="btn btn-primary" onClick={this.handleForm}>
+                        <i className="fa fa-pencil"> Novo</i>
+                    </button>
                     <table className="table mt-4">
                         <thead>
                             <tr>
