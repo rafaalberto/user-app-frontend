@@ -3,6 +3,8 @@ import Main from '../template/Main';
 import Pagination from '../template/Pagination';
 import api from '../../services/api';
 
+import './UserTable.css';
+
 const headerProps = {
     icon: 'users',
     title: 'Usuários',
@@ -10,11 +12,14 @@ const headerProps = {
 }
 
 class UserTable extends Component {
+
     state = {
         users: [],
         size: 5,
         totalElements: 0,
-        activePage: 1
+        activePage: 1,
+        sortField: 'username',
+        sortPosition: 'asc'
     }
 
     componentDidMount() {
@@ -22,17 +27,17 @@ class UserTable extends Component {
     }
 
     fetchUsers = async (page = 0) => {
-       try {
-            const response = await api.get(`/users?page=${page}&size=${this.state.size}`);
+        try {
+            const response = await api.get(`/users?page=${page}&size=${this.state.size}&orderBy=${this.state.sortField}&sortDirection=${this.state.sortPosition}`);
             this.setState({ users: response.data.content, totalElements: response.data.totalElements });
-       } catch (exception) {
+        } catch (exception) {
             console.error(exception.message);
-       }
+        }
     }
 
     handlePage = pageNumber => {
         this.fetchUsers(pageNumber - 1);
-        this.setState({ activePage: pageNumber })
+        this.setState({ activePage: pageNumber });
     }
 
     handleForm = () => {
@@ -47,9 +52,26 @@ class UserTable extends Component {
         try {
             await api.delete(`/users/${user.id}`);
             this.fetchUsers();
-       } catch (exception) {
+        } catch (exception) {
             console.error(exception.message);
-       }
+        }
+    }
+
+    addSort = field => {
+        if (field === this.state.sortField && this.state.sortPosition === 'asc') {
+            this.setState({ sortField: field, sortPosition: 'desc' }, () => this.fetchUsers());
+        } else if (field === this.state.sortField && this.state.sortPosition === 'desc') {
+            this.setState({ sortField: field, sortPosition: 'asc' }, () => this.fetchUsers());
+        } else {
+            this.setState({ sortField: field, sortPosition: 'asc' }, () => this.fetchUsers());
+        }
+    }
+
+    sortClass = field => {
+        if (field === this.state.sortField) {
+            return this.state.sortPosition === 'asc' ? 'sorting_asc' : 'sorting_desc';
+        }
+        return '';
     }
 
     renderRows = () => {
@@ -76,11 +98,11 @@ class UserTable extends Component {
                     <button className="btn btn-primary" onClick={this.handleForm}>
                         <i className="fa fa-pencil"> Novo</i>
                     </button>
-                    <table className="table mt-4">
+                    <table className="table mt-4 dataTable">
                         <thead>
                             <tr>
-                                <th>Usuário</th>
-                                <th>Nome</th>
+                                <th className={this.sortClass('username')} onClick={() => this.addSort('username')}>Usuário</th>
+                                <th className={this.sortClass('name')} onClick={() => this.addSort('name')}>Nome</th>
                                 <th>Ações</th>
                             </tr>
                         </thead>
@@ -88,10 +110,10 @@ class UserTable extends Component {
                             {this.renderRows()}
                         </tbody>
                     </table>
-                    <Pagination totalElements={this.state.totalElements} 
-                                size={this.state.size}
-                                activePage={this.state.activePage}
-                                onChange={this.handlePage} />
+                    <Pagination totalElements={this.state.totalElements}
+                        size={this.state.size}
+                        activePage={this.state.activePage}
+                        onChange={this.handlePage} />
                 </div>
             </Main>
         );

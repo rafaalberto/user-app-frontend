@@ -1,0 +1,15 @@
+.dataTable thead .sorting_asc {
+    background-image: url(../../assets/images/sort_asc.png);
+    background-repeat: no-repeat;
+    background-position: center right;
+}
+
+.dataTable thead .sorting_desc {
+    background-image: url(../../assets/images/sort_desc.png);
+    background-repeat: no-repeat;
+    background-position: center right;
+}
+
+.dataTable thead :hover {
+    cursor: pointer
+}
